@@ -9,9 +9,9 @@ import type {
 } from './command-result.js.flow'
 
 export interface CustomCommandDefinition {
-  authorization(command: CustomCommand, session: ?Session): Promise<boolean>,
+  +authorization?: (command: CustomCommand, session: ?Session) => Promise<boolean>,
   +normalization?: (query: CustomCommand, session: ?Session) => Promise<CustomCommand>,
-  validation(command: CustomCommand, session: ?Session): Promise<void>,
+  +validation?: (command: CustomCommand, session: ?Session) => Promise<void>,
   execution(command: CustomCommand, session: ?Session): Promise<CustomCommandResult>,
 }
 

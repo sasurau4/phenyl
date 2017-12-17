@@ -9,9 +9,9 @@ import type {
 } from './query-result.js.flow'
 
 export interface CustomQueryDefinition {
-  authorization(query: CustomQuery, session: ?Session): Promise<boolean>,
+  +authorization?: (query: CustomQuery, session: ?Session) => Promise<boolean>,
   +normalization?: (query: CustomQuery, session: ?Session) => Promise<CustomQuery>,
-  validation(query: CustomQuery, session: ?Session): Promise<void>,
+  +validation?: (query: CustomQuery, session: ?Session) => Promise<void>,
   execution(query: CustomQuery, session: ?Session): Promise<CustomQueryResult>, // CustomQueryHandler
 }
 

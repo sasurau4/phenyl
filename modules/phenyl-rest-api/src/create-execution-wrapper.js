@@ -8,10 +8,6 @@ import type {
   Session,
 } from 'phenyl-interfaces'
 
-function assertWrapExecution(fn: any, name: string, methodName: string) {
-  if (typeof fn !== 'function') throw new Error(`No "wrapExecution" function found for ${name} (methodName = ${methodName})`)
-}
-
 /**
  *
  */
@@ -40,7 +36,7 @@ export function createExecutionWrapper(fg: NormalizedFunctionalGroup): Execution
         const data = reqData.payload
         const entityDefinition = nonUsers[data.entityName] || users[data.entityName]
         if (entityDefinition == null) throw new Error(`Unkown entity name "${data.entityName}".`)
-        assertWrapExecution(entityDefinition.wrapExecution, data.entityName, method)
+        if (entityDefinition.wrapExecution == null) return execution(reqData, session)
         return entityDefinition.wrapExecution(reqData, session, execution)
       }
 

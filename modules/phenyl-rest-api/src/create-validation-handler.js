@@ -6,10 +6,6 @@ import type {
   Session,
 } from 'phenyl-interfaces'
 
-function assertValidationFunction(fn: any, name: string, methodName: string) {
-  if (typeof fn !== 'function') throw new Error(`No validation function found for ${name} (methodName = ${methodName})`)
-}
-
 /**
  *
  */
@@ -36,7 +32,7 @@ export function createValidationHandler(fg: NormalizedFunctionalGroup): Validati
         const data = reqData.payload
         const entityDefinition = nonUsers[data.entityName] || users[data.entityName]
         if (entityDefinition == null) throw new Error(`Unkown entity name "${data.entityName}".`)
-        assertValidationFunction(entityDefinition.validation, data.entityName, method)
+        if (entityDefinition.validation == null) return
         return entityDefinition.validation(reqData, session)
       }
 
@@ -44,7 +40,7 @@ export function createValidationHandler(fg: NormalizedFunctionalGroup): Validati
         const { payload } = reqData
         const customQueryDefinition = customQueries[payload.name]
         if (customQueryDefinition == null) throw new Error(`Unknown custom query name "${payload.name}".`)
-        assertValidationFunction(customQueryDefinition.validation, payload.name, method)
+        if (customQueryDefinition.validation == null) return
         return customQueryDefinition.validation(payload, session)
       }
 
@@ -52,7 +48,7 @@ export function createValidationHandler(fg: NormalizedFunctionalGroup): Validati
         const { payload } = reqData
         const customCommandDefinition = customCommands[payload.name]
         if (customCommandDefinition == null) throw new Error(`Unknown custom command name "${payload.name}".`)
-        assertValidationFunction(customCommandDefinition.validation, payload.name, method)
+        if (customCommandDefinition.validation == null) return
         return customCommandDefinition.validation(payload, session)
       }
 
@@ -61,7 +57,7 @@ export function createValidationHandler(fg: NormalizedFunctionalGroup): Validati
         const { payload } = reqData
         const userEntityDefinition = users[payload.entityName]
         if (userEntityDefinition == null) throw new Error(`Unknown entity name "${payload.entityName}".`)
-        assertValidationFunction(userEntityDefinition.validation, payload.entityName, method)
+        if (userEntityDefinition.validation == null) return
         return userEntityDefinition.validation(reqData, session)
       }
       default:

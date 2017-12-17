@@ -6,10 +6,6 @@ import type {
   Session,
 } from 'phenyl-interfaces'
 
-function assertAuthorizationFunction(fn: any, name: string, methodName: string) {
-  if (typeof fn !== 'function') throw new Error(`No authorization function found for ${name} (methodName = ${methodName})`)
-}
-
 /**
  *
  */
@@ -36,7 +32,7 @@ export function createAuthorizationHandler(fg: NormalizedFunctionalGroup): Autho
         const data = reqData.payload
         const entityDefinition = nonUsers[data.entityName] || users[data.entityName]
         if (entityDefinition == null) throw new Error(`Unkown entity name "${data.entityName}".`)
-        assertAuthorizationFunction(entityDefinition.authorization, data.entityName, method)
+        if (entityDefinition.authorization == null) return true
         return entityDefinition.authorization(reqData, session)
       }
 
@@ -44,7 +40,7 @@ export function createAuthorizationHandler(fg: NormalizedFunctionalGroup): Autho
         const { payload } = reqData
         const customQueryDefinition = customQueries[payload.name]
         if (customQueryDefinition == null) throw new Error(`Unknown custom query name "${payload.name}".`)
-        assertAuthorizationFunction(customQueryDefinition.authorization, payload.name, method)
+        if (customQueryDefinition.authorization == null) return true
         return customQueryDefinition.authorization(payload, session)
       }
 
@@ -52,7 +48,7 @@ export function createAuthorizationHandler(fg: NormalizedFunctionalGroup): Autho
         const { payload } = reqData
         const customCommandDefinition = customCommands[payload.name]
         if (customCommandDefinition == null) throw new Error(`Unknown custom command name "${payload.name}".`)
-        assertAuthorizationFunction(customCommandDefinition.authorization, payload.name, method)
+        if (customCommandDefinition.authorization == null) return true
         return customCommandDefinition.authorization(payload, session)
       }
 
@@ -61,7 +57,7 @@ export function createAuthorizationHandler(fg: NormalizedFunctionalGroup): Autho
         const { payload } = reqData
         const userEntityDefinition = users[payload.entityName]
         if (userEntityDefinition == null) throw new Error(`Unknown entity name "${payload.entityName}".`)
-        assertAuthorizationFunction(userEntityDefinition.authorization, payload.entityName, method)
+        if (userEntityDefinition.authorization == null) return true
         return userEntityDefinition.authorization(reqData, session)
       }
       default:
