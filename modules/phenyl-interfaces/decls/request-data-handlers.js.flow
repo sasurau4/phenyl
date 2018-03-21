@@ -9,6 +9,18 @@ import type {
   CustomQuery,
   PullQuery,
 } from './query.js.flow'
+import type {
+  TypeMap,
+  EntityOf,
+  EntityNamesOf,
+  CustomQueryNamesOf,
+  QueryParamsOf,
+  CustomCommandNamesOf,
+  CommandParamsOf,
+  UserEntityNamesOf,
+  CredentialsOf,
+  OptionsOf,
+} from './type-map.js.flow'
 
 import type {
   SingleInsertCommand,
@@ -22,28 +34,28 @@ import type {
   PushCommand,
 } from './command.js.flow'
 
-export type RequestDataHandlers<T> = {
-  handleDefault: (reqData: RequestData) => Promise<T>,
+export type RequestDataHandlers<TM: TypeMap, T> = {
+  handleDefault: (reqData: RequestData<*, TM>) => Promise<T>,
 
-  find?: (query: WhereQuery) => Promise<T>,
-  findOne?: (query: WhereQuery) => Promise<T>,
-  get?: (query: IdQuery) => Promise<T>,
-  getByIds?: (query: IdsQuery) => Promise<T>,
-  pull?: (query: PullQuery) => Promise<T>,
-  insertOne?: (command: SingleInsertCommand) => Promise<T>,
-  insertMulti?: (command: MultiInsertCommand) => Promise<T>,
-  insertAndGet?: (command: SingleInsertCommand) => Promise<T>,
-  insertAndGetMulti?: (command: MultiInsertCommand) => Promise<T>,
-  updateById?: (command: IdUpdateCommand) => Promise<T>,
-  updateMulti?: (command: MultiUpdateCommand) => Promise<T>,
-  updateAndGet?: (command: IdUpdateCommand) => Promise<T>,
-  updateAndFetch?: (command: MultiUpdateCommand) => Promise<T>,
-  push?: (command: PushCommand) => Promise<T>,
-  delete?: (command: DeleteCommand) => Promise<T>,
-  runCustomQuery?: (query: CustomQuery) => Promise<T>,
-  runCustomCommand?: (command: CustomCommand) => Promise<T>,
-  login?: (command: LoginCommand) => Promise<T>,
-  logout?: (command: LogoutCommand) => Promise<T>,
+  find?: (query: WhereQuery<EntityNamesOf<TM>>) => Promise<T>,
+  findOne?: (query: WhereQuery<EntityNamesOf<TM>>) => Promise<T>,
+  get?: (query: IdQuery<EntityNamesOf<TM>>) => Promise<T>,
+  getByIds?: (query: IdsQuery<EntityNamesOf<TM>>) => Promise<T>,
+  pull?: (query: PullQuery<EntityNamesOf<TM>>) => Promise<T>,
+  insertOne?: <N: EntityNamesOf<TM>>(command: SingleInsertCommand<N, EntityOf<TM, N>>) => Promise<T>,
+  insertMulti?: <N: EntityNamesOf<TM>>(command: MultiInsertCommand<N, EntityOf<TM, N>>) => Promise<T>,
+  insertAndGet?: <N: EntityNamesOf<TM>>(command: SingleInsertCommand<N, EntityOf<TM, N>>) => Promise<T>,
+  insertAndGetMulti?: <N: EntityNamesOf<TM>>(command: MultiInsertCommand<N, EntityOf<TM, N>>) => Promise<T>,
+  updateById?: (command: IdUpdateCommand<EntityNamesOf<TM>>) => Promise<T>,
+  updateMulti?: (command: MultiUpdateCommand<EntityNamesOf<TM>>) => Promise<T>,
+  updateAndGet?: (command: IdUpdateCommand<EntityNamesOf<TM>>) => Promise<T>,
+  updateAndFetch?: (command: MultiUpdateCommand<EntityNamesOf<TM>>) => Promise<T>,
+  push?: (command: PushCommand<EntityNamesOf<TM>>) => Promise<T>,
+  delete?: (command: DeleteCommand<EntityNamesOf<TM>>) => Promise<T>,
+  runCustomQuery?: <N: CustomQueryNamesOf<TM>>(query: CustomQuery<N, QueryParamsOf<TM, N>>) => Promise<T>,
+  runCustomCommand?: <N: CustomCommandNamesOf<TM>>(command: CustomCommand<N, CommandParamsOf<TM, N>>) => Promise<T>,
+  login?: <N: UserEntityNamesOf<TM>>(command: LoginCommand<N, CredentialsOf<TM, N>, OptionsOf<TM, N>>) => Promise<T>,
+  logout?: <N: UserEntityNamesOf<TM>>(command: LogoutCommand<N>) => Promise<T>,
 
-  notMatch?: (reqData: RequestData) => Promise<T>,
+  notMatch?: (reqData: RequestData<*, TM>) => Promise<T>,
 }

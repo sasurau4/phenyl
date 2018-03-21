@@ -19,7 +19,7 @@ export function createEntityClient(params: MemoryClientOptions = {}): PhenylMemo
   return new PhenylMemoryDbEntityClient(params)
 }
 
-export class PhenylMemoryDbEntityClient extends PhenylEntityClient {
+export class PhenylMemoryDbEntityClient<M: EntityMap> extends PhenylEntityClient {
 
   get entityState(): EntityState {
     // $FlowIssue(dbClient-is-instanceof-PhenylMemoryDbClient)

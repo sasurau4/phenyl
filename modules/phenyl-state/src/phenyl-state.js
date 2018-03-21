@@ -2,6 +2,7 @@
 import type {
   DeleteCommand,
   Entity,
+  EntityMap,
   EntityPool,
   EntityState,
   EntityStateFinder,
@@ -17,24 +18,24 @@ import type {
 import PhenylStateFinder from './phenyl-state-finder.js'
 import PhenylStateUpdater from './phenyl-state-updater.js'
 
-export type PhenylStateParams = {
-  pool?: EntityPool
+export type PhenylStateParams<M: EntityMap> = {
+  pool?: EntityPool<M>
 }
 
 /**
  *
  */
-export default class PhenylState implements EntityState, EntityStateFinder, EntityStateUpdater {
-  pool: EntityPool
+export default class PhenylState<M: EntityMap> implements EntityState, EntityStateFinder, EntityStateUpdater {
+  pool: EntityPool<M>
 
-  constructor(plain: PhenylStateParams = {}) {
+  constructor(plain: PhenylStateParams<$Shape<M>> = {}) {
     this.pool = plain.pool || {}
   }
 
   /**
    *
    */
-  find(query: WhereQuery): Array<Entity> {
+  find<N: string>(query: WhereQuery<N>): Array<Entity> {
     return PhenylStateFinder.find(this, query)
   }
 

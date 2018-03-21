@@ -1,7 +1,18 @@
 // @flow
 import type {
+  Entity,
+} from './entity.js.flow'
+
+import type {
   ServerError,
 } from './error.js.flow'
+
+import type {
+  TypeMap,
+  EntityOf,
+  QueryResultOf,
+  CommandResultOf,
+} from './type-map.js.flow'
 
 import type {
   CustomQueryResult,
@@ -24,51 +35,66 @@ import type {
   SingleInsertCommandResult,
 } from './command-result.js.flow'
 
-export type ResponseData =
-  FindResponseData |
-  FindOneResponseData |
-  GetResponseData |
-  GetByIdsResponseData |
-  PullResponseData |
+export type CRUDResponseData<E: Entity> =
+  FindResponseData<E> |
+  FindOneResponseData<E> |
+  GetResponseData<E> |
+  GetByIdsResponseData<E> |
+  PullResponseData<E> |
   InsertOneResponseData |
   InsertMultiResponseData |
-  InsertAndGetResponseData |
-  InsertAndGetMultiResponseData |
+  InsertAndGetResponseData<E> |
+  InsertAndGetMultiResponseData<E> |
   UpdateOneResponseData |
-  UpdateMultiResponseData |
-  UpdateAndGetResponseData |
-  UpdateAndFetchResponseData |
-  PushResponseData |
+  UpdateMultiResponseData<E> |
+  UpdateAndGetResponseData<E> |
+  UpdateAndFetchResponseData<E> |
+  PushResponseData<E> |
   DeleteResponseData |
-  RunCustomQueryResponseData |
-  RunCustomCommandResponseData |
-  LoginResponseData |
+  ErrorResponseData
+
+export type CustomQueryResponseData<R: Object> =
+  RunCustomQueryResponseData<R> |
+  ErrorResponseData
+
+export type CustomCommandResponseData<R: Object> =
+  RunCustomCommandResponseData<R> |
+  ErrorResponseData
+
+export type AuthResponseData<E: Entity> =
+  LoginResponseData<E> |
   LogoutResponseData |
   ErrorResponseData
 
-export type FindResponseData = {|
+export type ResponseData<N: string, TM: TypeMap> =
+  CRUDResponseData<EntityOf<TM, N>> |
+  CustomQueryResponseData<QueryResultOf<TM, N>> |
+  CustomCommandResponseData<CommandResultOf<TM, N>> |
+  AuthResponseData<EntityOf<TM, N>>
+
+export type FindResponseData<E: Entity> = {|
   type: 'find',
-  +payload: QueryResult,
+  +payload: QueryResult<E>,
 |}
 
-export type FindOneResponseData = {|
+export type FindOneResponseData<E: Entity> = {|
   type: 'findOne',
-  +payload: SingleQueryResult,
+  +payload: SingleQueryResult<E>,
 |}
 
-export type GetResponseData = {|
+export type GetResponseData<E: Entity> = {|
   type: 'get',
-  +payload: SingleQueryResult,
+  +payload: SingleQueryResult<E>,
 |}
 
-export type GetByIdsResponseData = {|
+export type GetByIdsResponseData<E: Entity> = {|
   type: 'getByIds',
-  +payload: QueryResult,
+  +payload: QueryResult<E>,
 |}
 
-export type PullResponseData = {|
+export type PullResponseData<E: Entity> = {|
   type: 'pull',
-  +payload: PullQueryResult,
+  +payload: PullQueryResult<E>,
 |}
 
 export type InsertOneResponseData = {|
@@ -81,14 +107,14 @@ export type InsertMultiResponseData = {|
   +payload: MultiInsertCommandResult,
 |}
 
-export type InsertAndGetResponseData = {|
+export type InsertAndGetResponseData<E: Entity> = {|
   type: 'insertAndGet',
-  +payload: GetCommandResult,
+  +payload: GetCommandResult<E>,
 |}
 
-export type InsertAndGetMultiResponseData = {|
+export type InsertAndGetMultiResponseData<E: Entity> = {|
   type: 'insertAndGetMulti',
-  +payload: MultiValuesCommandResult,
+  +payload: MultiValuesCommandResult<E, *>,
 |}
 
 export type UpdateOneResponseData = {|
@@ -96,24 +122,24 @@ export type UpdateOneResponseData = {|
   +payload: IdUpdateCommandResult,
 |}
 
-export type UpdateMultiResponseData = {|
+export type UpdateMultiResponseData<E: Entity> = {|
   type: 'updateMulti',
-  +payload: MultiUpdateCommandResult,
+  +payload: MultiUpdateCommandResult<E, *>,
 |}
 
-export type UpdateAndGetResponseData = {|
+export type UpdateAndGetResponseData<E: Entity> = {|
   type: 'updateAndGet',
-  +payload: GetCommandResult,
+  +payload: GetCommandResult<E>,
 |}
 
-export type UpdateAndFetchResponseData = {|
+export type UpdateAndFetchResponseData<E: Entity> = {|
   type: 'updateAndFetch',
-  +payload: MultiValuesCommandResult,
+  +payload: MultiValuesCommandResult<E>,
 |}
 
-export type PushResponseData = {|
+export type PushResponseData<E: Entity> = {|
   type: 'push',
-  +payload: PushCommandResult,
+  +payload: PushCommandResult<E>,
 |}
 
 export type DeleteResponseData = {|
@@ -121,19 +147,19 @@ export type DeleteResponseData = {|
   +payload: DeleteCommandResult,
 |}
 
-export type RunCustomQueryResponseData = {|
+export type RunCustomQueryResponseData<R: Object> = {|
   type: 'runCustomQuery',
-  +payload: CustomQueryResult,
+  +payload: CustomQueryResult<R>,
 |}
 
-export type RunCustomCommandResponseData = {|
+export type RunCustomCommandResponseData<R: Object> = {|
   type: 'runCustomCommand',
-  +payload: CustomCommandResult,
+  +payload: CustomCommandResult<R>,
 |}
 
-export type LoginResponseData = {|
+export type LoginResponseData<E: Entity> = {|
   type: 'login',
-  +payload: LoginCommandResult,
+  +payload: LoginCommandResult<E>,
 |}
 
 export type LogoutResponseData = {|

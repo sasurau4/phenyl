@@ -8,6 +8,19 @@ import type { LoginCommand, CustomCommand } from './command.js.flow'
 import type { CustomCommandResult } from './command-result.js.flow'
 import type { Id } from './id.js.flow'
 import type { Entity } from './entity.js.flow'
+import type {
+  TypeMap,
+  QueryParamsOf,
+  QueryResultOf,
+  CommandParamsOf,
+  CommandResultOf,
+  CredentialsOf,
+  OptionsOf,
+  EntityNamesOf,
+  CustomQueryNamesOf,
+  CustomCommandNamesOf,
+  UserEntityNamesOf,
+} from './type-map.js.flow'
 
 export type AuthenticationResult = {|
   ok: 1,
@@ -16,21 +29,36 @@ export type AuthenticationResult = {|
   versionId: ?Id,
 |}
 
-export type AuthorizationHandler = (reqData: RequestData, session: ?Session) => Promise<boolean>
-export type RequestNormalizationHandler = (reqData: RequestData, session: ?Session) => Promise<RequestData>
-export type ValidationHandler = (reqData: RequestData, session: ?Session) => Promise<void>
-export type AuthenticationHandler = (loginCommand: LoginCommand, session: ?Session) => Promise<AuthenticationResult>
-export type RestApiExecution = (reqData: RequestData, session: ?Session) => Promise<ResponseData>
-export type ExecutionWrapper = (reqData: RequestData, session: ?Session, execution: RestApiExecution) => Promise<ResponseData>
-export type CustomQueryHandler = (query: CustomQuery, session: ?Session) => Promise<CustomQueryResult>
-export type CustomCommandHandler = (command: CustomCommand, session: ?Session) => Promise<CustomCommandResult>
+export type AuthorizationHandler<TM: TypeMap> =
+  (reqData: RequestData<EntityNamesOf<TM>, TM>, session: ?Session) => Promise<boolean>
 
-export type HandlerParams = {
-  authorizationHandler: AuthorizationHandler,
-  normalizationHandler: RequestNormalizationHandler,
-  validationHandler: ValidationHandler,
-  authenticationHandler: AuthenticationHandler,
-  executionWrapper: ExecutionWrapper,
-  customQueryHandler: CustomQueryHandler,
-  customCommandHandler: CustomCommandHandler,
+export type RequestNormalizationHandler<TM: TypeMap> =
+  (reqData: RequestData<EntityNamesOf<TM>, TM>, session: ?Session) => Promise<RequestData<EntityNamesOf<TM>, TM>>
+
+export type ValidationHandler<TM: TypeMap> =
+  (reqData: RequestData<EntityNamesOf<TM>, TM>, session: ?Session) => Promise<void>
+
+export type AuthenticationHandler<TM: TypeMap, N: UserEntityNamesOf<TM>> =
+  (loginCommand: LoginCommand<N, CredentialsOf<TM, N>, OptionsOf<TM, N>>, session: ?Session) => Promise<AuthenticationResult>
+
+export type RestApiExecution<TM: TypeMap> =
+  (reqData: RequestData<EntityNamesOf<TM>, TM>, session: ?Session) => Promise<ResponseData>
+
+export type ExecutionWrapper<TM: TypeMap> =
+  (reqData: RequestData<EntityNamesOf<TM>, TM>, session: ?Session, execution: RestApiExecution<TM>) => Promise<ResponseData>
+
+export type CustomQueryHandler<TM: TypeMap, N: CustomQueryNamesOf<TM>> =
+  (query: CustomQuery<N, QueryParamsOf<TM, N>>, session: ?Session) => Promise<CustomQueryResult<QueryResultOf<TM, N>>>
+
+export type CustomCommandHandler<TM: TypeMap, N: CustomCommandNamesOf<TM>> =
+  (command: CustomCommand<N, CommandParamsOf<TM, N>>, session: ?Session) => Promise<CustomCommandResult<CommandResultOf<TM, N>>>
+
+export type HandlerParams<TM: TypeMap> = {
+  authorizationHandler: AuthorizationHandler<TM>,
+  normalizationHandler: RequestNormalizationHandler<TM>,
+  validationHandler: ValidationHandler<TM>,
+  authenticationHandler: AuthenticationHandler<TM>,
+  executionWrapper: ExecutionWrapper<TM>,
+  customQueryHandler: CustomQueryHandler<TM>,
+  customCommandHandler: CustomCommandHandler<TM>,
 }

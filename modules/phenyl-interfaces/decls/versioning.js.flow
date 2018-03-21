@@ -7,6 +7,8 @@ import type {
   PushCommand
 } from './command.js.flow'
 
+type EntityName = string
+
 export type EntityVersion = {
   id: Id,
   op: string, // stringified UpdateOperation
@@ -23,7 +25,7 @@ export type EntityWithMetaInfo = {
 }
 
 export type VersionDiff = {|
-  entityName: string,
+  entityName: EntityName,
   id: Id,
   prevVersionId: Id,
   versionId: Id,
@@ -33,7 +35,7 @@ export type VersionDiff = {|
 export type SubscriptionRequest = {|
   method: 'subscribe',
   payload: {
-    entityName: string,
+    entityName: EntityName,
     id: Id,
   },
   sessionId?: ?Id,
@@ -41,14 +43,14 @@ export type SubscriptionRequest = {|
 
 
 export type SubscriptionResult = {|
-  entityName: string,
+  entityName: EntityName,
   id: Id,
   result: boolean,
   ttl?: number,
 |}
 
 export type SubscriptionInfo = {|
-  entityName: string,
+  entityName: EntityName,
   id: Id,
   ttl?: number,
 |}
@@ -66,7 +68,7 @@ export interface VersionDiffPublisher {
 /**
  * Validate PushCommand in PhenylEntityClient.
  */
-export type PushValidation = (
-  command: PushCommand,
-  entity: Entity,
+export type PushValidation<N: EntityName, E: Entity> = (
+  command: PushCommand<N>,
+  entity: E,
   masterOperations: ?Array<UpdateOperation>) => void

@@ -1,7 +1,8 @@
 // @flow
 import type { RequestData } from './request-data.js.flow'
 import type { ResponseData } from './response-data.js.flow'
+import type { TypeMap } from './type-map.js.flow'
 
-export interface RestApiHandler {
-  handleRequestData(reqData: RequestData): Promise<ResponseData>,
+export interface RestApiHandler<TM: TypeMap, N: string> {
+  handleRequestData(reqData: RequestData<N, TM>): Promise<ResponseData<N, TM>>,
 }

@@ -1,15 +1,21 @@
 // @flow
 
+import type {
+  Entity,
+  EntityMap,
+} from './entity.js.flow'
 import type { Session } from './session.js.flow'
-import type { RequestData } from './request-data.js.flow'
+import type { CRUDRequestData } from './request-data.js.flow'
 import type { ResponseData } from './response-data.js.flow'
 import type { RestApiExecution } from './handler.js.flow'
 
-export interface EntityDefinition {
-  authorization(reqData: RequestData, session: ?Session): Promise<boolean>, // AuthorizationHandler
-  +normalization?: (reqData: RequestData, session: ?Session) => Promise<RequestData>, // RequestNormalizationHandler
-  validation(reqData: RequestData, session: ?Session): Promise<void>, // ValidationHandler
-  wrapExecution(reqData: RequestData, session: ?Session, execution: RestApiExecution): Promise<ResponseData>, // ExecutionWrapper
+type EntityName = string
+
+export interface EntityDefinition<N: EntityName, E: Entity> {
+  authorization(reqData: CRUDRequestData<N, E>, session: ?Session): Promise<boolean>, // AuthorizationHandler
+  +normalization?: (reqData: CRUDRequestData<N, E>, session: ?Session) => Promise<CRUDRequestData<N, E>>, // RequestNormalizationHandler
+  validation(reqData: CRUDRequestData<N, E>, session: ?Session): Promise<void>, // ValidationHandler
+  wrapExecution(reqData: CRUDRequestData<N, E>, session: ?Session, execution: RestApiExecution): Promise<ResponseData>, // ExecutionWrapper
 }
 
-export type EntityDefinitions = { [entityName: string]: EntityDefinition }
+export type EntityDefinitions<EM: EntityMap> = $ObjMap<EM, <T, N>(T, N) => EntityDefinition<N, T>>

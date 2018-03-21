@@ -3,6 +3,18 @@ import type {
   Id
 } from './id.js.flow'
 import type {
+  TypeMap,
+  EntityOf,
+  QueryParamsOf,
+  CommandParamsOf,
+  CredentialsOf,
+  OptionsOf,
+} from './type-map.js.flow'
+import type {
+  Entity,
+  PreEntity,
+} from './entity.js.flow'
+import type {
   IdsQuery,
   IdQuery,
   PullQuery,
@@ -20,6 +32,8 @@ import type {
   MultiUpdateCommand,
   CustomCommand,
 } from './command.js.flow'
+
+type EntityName = string
 
 export type RequestMethodName =
   'find' |
@@ -41,137 +55,143 @@ export type RequestMethodName =
   'login' |
   'logout'
 
-export type RequestData =
-  FindRequestData |
-  FindOneRequestData |
-  GetRequestData |
-  GetByIdsRequestData |
-  PullRequestData |
-  InsertOneRequestData |
-  InsertMultiRequestData |
-  InsertAndGetRequestData |
-  InsertAndGetMultiRequestData |
-  UpdateOneRequestData |
-  UpdateMultiRequestData |
-  UpdateAndGetRequestData |
-  UpdateAndFetchRequestData |
-  PushRequestData |
-  DeleteRequestData |
-  RunCustomQueryRequestData |
-  RunCustomCommandRequestData |
-  LoginRequestData |
-  LogoutRequestData
+export type CRUDRequestData<N: EntityName, E: Entity> =
+  FindRequestData<N> |
+  FindOneRequestData<N> |
+  GetRequestData<N> |
+  GetByIdsRequestData<N> |
+  PullRequestData<N> |
+  InsertOneRequestData<N, E> |
+  InsertMultiRequestData<N, E> |
+  InsertAndGetRequestData<N, E> |
+  InsertAndGetMultiRequestData<N, E> |
+  UpdateOneRequestData<N> |
+  UpdateMultiRequestData<N> |
+  UpdateAndGetRequestData<N> |
+  UpdateAndFetchRequestData<N> |
+  PushRequestData<N> |
+  DeleteRequestData<N>
 
-export type FindRequestData = {|
+export type AuthRequestData<N: EntityName, C: Object, O: Object> =
+  LoginRequestData<N, C, O> |
+  LogoutRequestData<N>
+
+export type RequestData<N: string, TM: TypeMap> =
+  CRUDRequestData<N, EntityOf<TM, N>> |
+  RunCustomQueryRequestData<N, QueryParamsOf<TM, N>> |
+  RunCustomCommandRequestData<N, CommandParamsOf<TM, N>> |
+  AuthRequestData<N, CredentialsOf<TM, N>, OptionsOf<TM, N>>
+
+export type FindRequestData<N: EntityName> = {|
   method: 'find',
-  +payload: WhereQuery,
+  +payload: WhereQuery<N>,
   sessionId?: ?Id,
 |}
 
-export type FindOneRequestData = {|
+export type FindOneRequestData<N: EntityName> = {|
   method: 'findOne',
-  +payload: WhereQuery,
+  +payload: WhereQuery<N>,
   sessionId?: ?Id,
 |}
 
-export type GetRequestData = {|
+export type GetRequestData<N: EntityName> = {|
   method: 'get',
-  +payload: IdQuery,
+  +payload: IdQuery<N>,
   sessionId?: ?Id,
 |}
 
-export type GetByIdsRequestData = {|
+export type GetByIdsRequestData<N: EntityName> = {|
   method: 'getByIds',
-  +payload: IdsQuery,
+  +payload: IdsQuery<N>,
   sessionId?: ?Id,
 |}
 
-export type PullRequestData = {|
+export type PullRequestData<N: EntityName> = {|
   method: 'pull',
-  +payload: PullQuery,
+  +payload: PullQuery<N>,
   sessionId?: ?Id,
 |}
 
-export type InsertOneRequestData = {|
+export type InsertOneRequestData<N: EntityName, E: Entity> = {|
   method: 'insertOne',
-  +payload: SingleInsertCommand,
+  +payload: SingleInsertCommand<N, PreEntity<E>>,
   sessionId?: ?Id,
 |}
 
-export type InsertMultiRequestData = {|
+export type InsertMultiRequestData<N: EntityName, E: Entity> = {|
   method: 'insertMulti',
-  +payload: MultiInsertCommand,
+  +payload: MultiInsertCommand<N, PreEntity<E>>,
   sessionId?: ?Id,
 |}
 
-export type InsertAndGetRequestData = {|
+export type InsertAndGetRequestData<N: EntityName, E: Entity> = {|
   method: 'insertAndGet',
-  +payload: SingleInsertCommand,
+  +payload: SingleInsertCommand<N, PreEntity<E>>,
   sessionId?: ?Id,
 |}
 
-export type InsertAndGetMultiRequestData = {|
+export type InsertAndGetMultiRequestData<N: EntityName, E: Entity> = {|
   method: 'insertAndGetMulti',
-  +payload: MultiInsertCommand,
+  +payload: MultiInsertCommand<N, PreEntity<E>>,
   sessionId?: ?Id,
 |}
 
-export type UpdateOneRequestData = {|
+export type UpdateOneRequestData<N: EntityName> = {|
   method: 'updateById',
-  +payload: IdUpdateCommand,
+  +payload: IdUpdateCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type UpdateMultiRequestData = {|
+export type UpdateMultiRequestData<N: EntityName> = {|
   method: 'updateMulti',
-  +payload: MultiUpdateCommand,
+  +payload: MultiUpdateCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type UpdateAndGetRequestData = {|
+export type UpdateAndGetRequestData<N> = {|
   method: 'updateAndGet',
-  +payload: IdUpdateCommand,
+  +payload: IdUpdateCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type UpdateAndFetchRequestData = {|
+export type UpdateAndFetchRequestData<N> = {|
   method: 'updateAndFetch',
-  +payload: MultiUpdateCommand,
+  +payload: MultiUpdateCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type PushRequestData = {|
+export type PushRequestData<N: EntityName> = {|
   method: 'push',
-  +payload: PushCommand,
+  +payload: PushCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type DeleteRequestData = {|
+export type DeleteRequestData<N: EntityName> = {|
   method: 'delete',
-  +payload: DeleteCommand,
+  +payload: DeleteCommand<N>,
   sessionId?: ?Id,
 |}
 
-export type RunCustomQueryRequestData = {|
+export type RunCustomQueryRequestData<N: string, P: Object> = {|
   method: 'runCustomQuery',
-  +payload: CustomQuery,
+  +payload: CustomQuery<N, P>,
   sessionId?: ?Id,
 |}
 
-export type RunCustomCommandRequestData = {|
+export type RunCustomCommandRequestData<N: string, P: Object> = {|
   method: 'runCustomCommand',
-  +payload: CustomCommand,
+  +payload: CustomCommand<N, P>,
   sessionId?: ?Id,
 |}
 
-export type LoginRequestData = {|
+export type LoginRequestData<N: EntityName, C: Object, O: Object> = {|
   method: 'login',
-  +payload: LoginCommand,
+  +payload: LoginCommand<N, C, O>,
   sessionId?: ?Id,
 |}
 
-export type LogoutRequestData = {|
+export type LogoutRequestData<N: EntityName> = {|
   method: 'logout',
-  +payload: LogoutCommand,
+  +payload: LogoutCommand<N>,
   sessionId?: ?Id,
 |}
