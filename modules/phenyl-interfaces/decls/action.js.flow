@@ -4,17 +4,12 @@ import type {
 } from 'mongolike-operations'
 
 import type {
-  AuthCredentials,
-  AuthOptions,
-} from './client.js.flow'
-
-import type {
   Id
 } from './id.js.flow'
 
 import type {
   Entity,
-  EntityMap,
+  EntityName,
   EntityInfo,
   EntitiesInfo,
 } from './entity.js.flow'
@@ -39,14 +34,15 @@ import type {
 } from './command.js.flow'
 
 import type {
-  AuthCommandMap
-} from './command-result.js.flow'
-
-import type {
   IdQuery,
 } from './query.js.flow'
 
-type EntityName = string
+import type {
+  AuthCommandMap,
+  AuthCredentials,
+  AuthOptions,
+  EntityMap,
+} from './type-map.js.flow'
 
 export type ActionTag = string
 
@@ -62,9 +58,9 @@ export type AssignAction = {|
 /**
  *
  */
-export type ReplaceAction = {|
+export type ReplaceAction<M: EntityMap> = {|
   type: 'phenyl/replace',
-  payload: LocalState,
+  payload: LocalState<M>,
   tag: ActionTag,
 |}
 
@@ -89,15 +85,15 @@ export type DeleteAction<N: EntityName> = {|
   tag: ActionTag,
 |}
 
-export type FollowAction<N: EntityName, M: EntityMap> = {|
+export type FollowAction<N: EntityName, E: Entity> = {|
   type: 'phenyl/follow',
-  payload: EntityInfo<N, $ElementType<M, N>>,
+  payload: EntityInfo<N, E>,
   tag: ActionTag,
 |}
 
-export type FollowAllAction<N: EntityName, M: EntityMap> = {|
+export type FollowAllAction<N: EntityName, E: Entity> = {|
   type: 'phenyl/followAll',
-  payload: EntitiesInfo<N, $ElementType<M, N>>,
+  payload: EntitiesInfo<N, E>,
   tag: ActionTag,
 |}
 
@@ -155,7 +151,7 @@ export type UnsetSessionAction = {|
 
 export type PhenylAction<M: EntityMap, AM: AuthCommandMap> =
   AssignAction |
-  ReplaceAction |
+  ReplaceAction<M> |
   ResetAction |
   CommitAndPushAction<$Keys<M>> |
   DeleteAction<$Keys<M>> |

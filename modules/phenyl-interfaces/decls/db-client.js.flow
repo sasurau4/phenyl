@@ -1,8 +1,11 @@
 // @flow
 import type {
   PreEntity,
-  EntityMap,
 } from './entity.js.flow'
+
+import type {
+  EntityMap,
+} from './type-map.js.flow'
 
 import type {
   IdQuery,

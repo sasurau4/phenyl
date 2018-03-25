@@ -1,10 +1,10 @@
 // @flow
 import type {
   ServerError,
-  ResponseData,
+  AnyResponseData,
 } from 'phenyl-interfaces'
 
-export default function getStatusCode(resData: ResponseData): number {
+export default function getStatusCode(resData: AnyResponseData): number {
   if (resData.error != null) {
     return getErrorStatusCode(resData.error)
   }

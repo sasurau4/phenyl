@@ -1,10 +1,10 @@
 // @flow
 import type {
-  RequestData
+  RequestDataOf
 } from './request-data.js.flow'
 
 import type {
-  ResponseData
+  ResponseDataOf
 } from './response-data.js.flow'
 
 import type {
@@ -26,10 +26,10 @@ import type {
   RestApiHandler
 } from './rest-api-handler.js.flow'
 
-export type WebSocketClientMessage<N: string, TM: TypeMap> = WebSocketClientRequestDataMessage<N, TM> | WebSocketClientSubscriptionRequestMessage
+export type WebSocketClientMessage<TM: TypeMap> = WebSocketClientRequestDataMessage<TM> | WebSocketClientSubscriptionRequestMessage
 
-export type WebSocketClientRequestDataMessage<N: string, TM: TypeMap> = {|
-  reqData: RequestData<N, TM>,
+export type WebSocketClientRequestDataMessage<TM: TypeMap> = {|
+  reqData: RequestDataOf<TM>,
   tag: string,
 |}
 
@@ -38,14 +38,14 @@ export type WebSocketClientSubscriptionRequestMessage = {|
   tag: string,
 |}
 
-export type WebSocketServerMessage<N: string, TM: TypeMap> =
-  WebSocketServerResponseDataMessage<N, TM> |
+export type WebSocketServerMessage<TM: TypeMap> =
+  WebSocketServerResponseDataMessage<TM> |
   WebSocketServerVersionDiffMessage |
   WebSocketServerSubscriptionResultMessage |
   WebSocketServerErrorMessage
 
-export type WebSocketServerResponseDataMessage<N: string, TM: TypeMap> = {|
-  resData: ResponseData<N, TM>,
+export type WebSocketServerResponseDataMessage<TM: TypeMap> = {|
+  resData: ResponseDataOf<TM>,
   tag: string,
 |}
 

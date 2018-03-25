@@ -6,13 +6,13 @@ import {
 import type {
   EncodedHttpRequest,
   QueryStringParams,
-  RequestData,
+  AnyRequestData,
 } from 'phenyl-interfaces'
 
 /**
  *
  */
-export default function encodeRequest(reqData: RequestData): EncodedHttpRequest {
+export default function encodeRequest(reqData: AnyRequestData): EncodedHttpRequest {
   assertValidRequestData(reqData)
   const { sessionId } = reqData
   const headers: Object = (sessionId != null) ? { authorization: sessionId } : {}
@@ -206,7 +206,7 @@ export default function encodeRequest(reqData: RequestData): EncodedHttpRequest 
       if (reqData.method) {
         throw new Error(`Invalid request method: "${reqData.method}"`)
       }
-      throw new Error('Request method not given in RequestData.')
+      throw new Error('Request method not given in AnyRequestData.')
   }
 }
 

@@ -1,6 +1,7 @@
 // @flow
 import type { UpdateOperation } from 'mongolike-operations'
-import type { Entity, EntityMap } from './entity.js.flow'
+import type { EntityMap } from './type-map.js.flow'
+import type { Entity } from './entity.js.flow'
 import type { Id } from './id.js.flow'
 import type { Session } from './session.js.flow'
 import type { PhenylErrorType, ErrorLocation } from './error.js.flow'

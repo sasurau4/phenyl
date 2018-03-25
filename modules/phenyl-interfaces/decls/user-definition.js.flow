@@ -1,18 +1,17 @@
 // @flow
 
-import type {
-  AuthCredentials,
-  AuthOptions,
-} from './client.js.flow'
-import type { EntityMap } from './entity.js.flow'
 import type { EntityDefinition } from './entity-definition.js.flow'
 import type { Session } from './session.js.flow'
 import type {
   LoginCommand,
 } from './command.js.flow'
+
 import type {
+  EntityMap,
+  AuthCredentials,
+  AuthOptions,
   AuthCommandMap,
-} from './command-result.js.flow'
+} from './type-map.js.flow'
 import type {
   AuthenticationResult
 } from './handler.js.flow'

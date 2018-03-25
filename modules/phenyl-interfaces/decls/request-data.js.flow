@@ -9,6 +9,10 @@ import type {
   CommandParamsOf,
   CredentialsOf,
   OptionsOf,
+  EntityNameOf,
+  CustomQueryNameOf,
+  CustomCommandNameOf,
+  UserEntityNameOf,
 } from './type-map.js.flow'
 import type {
   Entity,
@@ -76,11 +80,20 @@ export type AuthRequestData<N: EntityName, C: Object, O: Object> =
   LoginRequestData<N, C, O> |
   LogoutRequestData<N>
 
-export type RequestData<N: string, TM: TypeMap> =
-  CRUDRequestData<N, EntityOf<TM, N>> |
-  RunCustomQueryRequestData<N, QueryParamsOf<TM, N>> |
-  RunCustomCommandRequestData<N, CommandParamsOf<TM, N>> |
-  AuthRequestData<N, CredentialsOf<TM, N>, OptionsOf<TM, N>>
+export type RequestData<
+  TM: TypeMap,
+  EN: EntityNameOf<TM>,
+  QN: CustomQueryNameOf<TM>,
+  CN: CustomCommandNameOf<TM>,
+  AN: UserEntityNameOf<TM>,
+> =
+  CRUDRequestData<EN, EntityOf<TM, EN>> |
+  RunCustomQueryRequestData<QN, QueryParamsOf<TM, QN>> |
+  RunCustomCommandRequestData<CN, CommandParamsOf<TM, CN>> |
+  AuthRequestData<AN, CredentialsOf<TM, AN>, OptionsOf<TM, AN>>
+
+export type AnyRequestData = RequestData<*, *, *, *, *>
+export type RequestDataOf<TM: TypeMap> = RequestData<TM, *, *, *, *>
 
 export type FindRequestData<N: EntityName> = {|
   method: 'find',

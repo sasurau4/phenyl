@@ -2,6 +2,7 @@
 import type { UpdateOperation } from 'mongolike-operations'
 import type { Id } from './id.js.flow'
 import type { Entity } from './entity.js.flow'
+import type { EntityMap } from './type-map.js.flow'
 
 import type {
   PushCommand
@@ -19,8 +20,7 @@ export type EntityMetaInfo = {
 }
 
 
-export type EntityWithMetaInfo = {
-  id: Id,
+export type EntityWithMetaInfo<T: Entity> = T & {
   _PhenylMeta: EntityMetaInfo
 }
 
@@ -68,7 +68,7 @@ export interface VersionDiffPublisher {
 /**
  * Validate PushCommand in PhenylEntityClient.
  */
-export type PushValidation<N: EntityName, E: Entity> = (
+export type PushValidation<M: EntityMap> = <N: $Keys<M>>(
   command: PushCommand<N>,
-  entity: E,
+  entity: $ElementType<M, N>,
   masterOperations: ?Array<UpdateOperation>) => void

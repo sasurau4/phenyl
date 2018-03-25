@@ -4,14 +4,14 @@ import type {
   EncodedHttpRequest,
   Id,
   QueryStringParams,
-  RequestData,
+  AnyRequestData,
 } from 'phenyl-interfaces'
 
 /**
  *
  */
-export default function decodeRequest(request: EncodedHttpRequest): RequestData {
-  let reqData: RequestData
+export default function decodeRequest(request: EncodedHttpRequest): AnyRequestData {
+  let reqData: AnyRequestData
   const sessionId = decodeSessionId(request)
   switch (request.method) {
     case 'GET':
@@ -38,7 +38,7 @@ export default function decodeRequest(request: EncodedHttpRequest): RequestData 
 /**
  * @private
  */
-function decodeGETRequest(request: EncodedHttpRequest): RequestData {
+function decodeGETRequest(request: EncodedHttpRequest): AnyRequestData {
   const {
     path,
     qsParams,
@@ -96,7 +96,7 @@ function decodeGETRequest(request: EncodedHttpRequest): RequestData {
 /**
  * @private
  */
-function decodePOSTRequest(request: EncodedHttpRequest): RequestData {
+function decodePOSTRequest(request: EncodedHttpRequest): AnyRequestData {
   const {
     path,
     body
@@ -155,7 +155,7 @@ function decodePOSTRequest(request: EncodedHttpRequest): RequestData {
 /**
  * @private
  */
-function decodePUTRequest(request: EncodedHttpRequest): RequestData {
+function decodePUTRequest(request: EncodedHttpRequest): AnyRequestData {
   const {
     path,
     body
@@ -201,7 +201,7 @@ function decodePUTRequest(request: EncodedHttpRequest): RequestData {
 /**
  * @private
  */
-function decodeDELETERequest(request: EncodedHttpRequest): RequestData {
+function decodeDELETERequest(request: EncodedHttpRequest): AnyRequestData {
   const {
     path,
     qsParams,

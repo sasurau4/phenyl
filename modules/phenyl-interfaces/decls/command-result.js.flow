@@ -7,8 +7,6 @@ import type { Id } from './id.js.flow'
 import type { Session } from './session.js.flow'
 import type { Entity } from './entity.js.flow'
 
-type EntityName = string
-
 export type DeleteCommandResult = {
   ok: 1,
   n: number,
@@ -79,19 +77,11 @@ export type CustomCommandResult<R: Object> = {
   result?: R
 }
 
-export type CustomCommandMap = {
-  [name: string]: { params: Object, result: Object }
-}
-
 export type LoginCommandResult<E: Entity> = {
   ok: 1,
   session: Session,
   user: ?E,
   versionId: ?Id,
-}
-
-export type AuthCommandMap = {
-  [name: EntityName]: { credentials: Object, options?: Object }
 }
 
 export type LogoutCommandResult = {

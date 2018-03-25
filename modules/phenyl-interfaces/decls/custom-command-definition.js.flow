@@ -5,13 +5,13 @@ import type {
   CustomCommand,
 } from './command.js.flow'
 import type {
-  CustomParams,
-  CustomResult,
-} from './client.js.flow'
-import type {
-  CustomCommandMap,
   CustomCommandResult,
 } from './command-result.js.flow'
+import type {
+  CustomParams,
+  CustomResult,
+  CustomCommandMap,
+} from './type-map.js.flow'
 
 export interface CustomCommandDefinition<N: string, P: Object, R: Object> {
   authorization(command: CustomCommand<N, P>, session: ?Session): Promise<boolean>,

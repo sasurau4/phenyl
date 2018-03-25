@@ -11,10 +11,6 @@ export type CustomQueryResult<R: Object> = {
   result: ?R
 }
 
-export type CustomQueryMap = {
-  [name: string]: { params: Object, result: Object }
-}
-
 export type QueryResult<E: Entity> = {|
   ok: 1,
   entities: Array<E>,

@@ -7,15 +7,16 @@ import type {
   RestApiHandler,
   RequestData,
   ResponseData,
+  TypeMap,
 } from 'phenyl-interfaces'
 
 /**
  * Client to access to the given RestApiHandler directly.
  */
-export class PhenylRestApiDirectClient extends PhenylRestApiClient {
-  restApiHandler: RestApiHandler
+export class PhenylRestApiDirectClient<TM: TypeMap> extends PhenylRestApiClient<TM> {
+  restApiHandler: RestApiHandler<TM>
 
-  constructor(restApiHandler: RestApiHandler) {
+  constructor(restApiHandler: RestApiHandler<TM>) {
     super()
     this.restApiHandler = restApiHandler
   }
@@ -24,7 +25,7 @@ export class PhenylRestApiDirectClient extends PhenylRestApiClient {
    * @override
    * Access to PhenylRestApi directly.
    */
-  async handleRequestData(reqData: RequestData): Promise<ResponseData> {
+  async handleRequestData(reqData) {
     return this.restApiHandler.handleRequestData(reqData)
   }
 }

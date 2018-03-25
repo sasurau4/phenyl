@@ -17,17 +17,18 @@ import type {
   PathModifier,
   RestApiHandler,
   ServerParams,
+  TypeMap,
 } from 'phenyl-interfaces'
 
 /**
  *
  */
-export default class ServerLogic {
+export default class ServerLogic<TM: TypeMap> {
   /**
    * Instance containing API logic invoked via run().
    * PhenylRestApi instance is expected.
    */
-  restApiHandler: RestApiHandler
+  restApiHandler: RestApiHandler<TM>
   /**
    * (path: string) => string
    * Real server path to regular path.

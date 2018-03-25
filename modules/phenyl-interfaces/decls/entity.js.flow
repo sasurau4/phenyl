@@ -1,13 +1,12 @@
 // @flow
 import type { Id } from './id.js.flow'
 
-type EntityName = string
+export type EntityName = string
 
 export type Entity = $Subtype<{ id: Id }>
+export type ProEntity = { +id?: Id }
 
 export type PreEntity<T: Entity> = T | $Subtype<$Diff<T, {| id: Id |}>>
-
-export type ProEntity = PreEntity<{ id: Id }>
 
 export type EntityInfo<N: EntityName, T: Entity> = {
   entityName: N,
@@ -20,5 +19,3 @@ export type EntitiesInfo<N: EntityName, T: Entity> = {
   entities: Array<T>,
   versionsById: { [entityId: Id]: Id },
 }
-
-export type EntityMap = { [string]: Entity }

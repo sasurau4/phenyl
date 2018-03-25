@@ -16,6 +16,7 @@ import type {
   HttpClientParams,
   ClientPathModifier,
   QueryStringParams,
+  TypeMap,
 } from 'phenyl-interfaces'
 
 /**
@@ -38,7 +39,7 @@ import type {
  * AuthClient:
  *   login | logout
  */
-export default class PhenylHttpClient extends PhenylRestApiClient {
+export default class PhenylHttpClient<TM: TypeMap> extends PhenylRestApiClient<TM> {
   /**
    * Base URL without "/api".
    *  No slash at the last.
@@ -63,7 +64,13 @@ export default class PhenylHttpClient extends PhenylRestApiClient {
    * @override
    * Access to PhenylRestApi on server and get ResponseData.
    */
-  async handleRequestData(reqData: RequestData): Promise<ResponseData> {
+  async handleRequestData<
+    EN: string,
+    QN: string,
+    CN: string,
+    AN: string,
+    ReqData: RequestData<TM, EN, QN, CN, AN>
+  >(reqData: ReqData): Promise<ResponseData<TM, EN, QN, CN, AN, ReqData>> {
     const {
       method,
       headers,

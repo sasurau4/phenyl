@@ -4,8 +4,12 @@ import type {
 } from 'mongolike-operations'
 
 import type {
-  Entity,
   EntityMap,
+} from './type-map.js.flow'
+
+import type {
+  Entity,
+  EntityName,
 } from './entity.js.flow'
 
 import type {
@@ -20,25 +24,24 @@ import type {
   DeleteCommand,
 } from './command.js.flow'
 
-type EntityName = string
-export type EntityPool<M: EntityMap> = $ObjMap<M, <T>(T) => { [entityName: string]: EntitiesById<T> }>
+export type EntityPool<M: EntityMap> = $ObjMap<M, <T>(T) => { [entityName: EntityName]: EntitiesById<T> }>
 export type EntitiesById<T: Entity> = { [id: string]: T }
 
-export type EntityState<M: EntityMap> = {
+export interface EntityState<M: EntityMap> {
   pool: EntityPool<M>
 }
 
-export interface EntityStateFinder<N: EntityName, E: Entity> {
-  find(query: WhereQuery<N>): Array<E>,
-  findOne(query: WhereQuery<N>): ?E,
-  get(query: IdQuery<N>): E,
-  getByIds(query: IdsQuery<N>): Array<E>,
-  has(query: IdQuery<N>): boolean,
+export interface EntityStateFinder<M: EntityMap> {
+  find<N: EntityName>(query: WhereQuery<N>): Array<$ElementType<M, N>>,
+  findOne<N: EntityName>(query: WhereQuery<N>): ?$ElementType<M, N>,
+  get<N: EntityName>(query: IdQuery<N>): $ElementType<M, N>,
+  getByIds<N: EntityName>(query: IdsQuery<N>): Array<$ElementType<M, N>>,
+  has<N: EntityName>(query: IdQuery<N>): boolean,
 }
 
-export interface EntityStateUpdater<N: EntityName, E: Entity> {
-  register(entityName: N, ...entities: Array<E>): UpdateOperation,
-  updateById(command: IdUpdateCommand<N>): UpdateOperation,
-  updateMulti(command: MultiUpdateCommand<N>): UpdateOperation,
-  delete(command: DeleteCommand<N>): UpdateOperation,
+export interface EntityStateUpdater<M: EntityMap> {
+  register<N: EntityName>(entityName: N, ...entities: Array<$ElementType<M, N>>): UpdateOperation,
+  updateById<N: EntityName>(command: IdUpdateCommand<N>): UpdateOperation,
+  updateMulti<N: EntityName>(command: MultiUpdateCommand<N>): UpdateOperation,
+  delete<N: EntityName>(command: DeleteCommand<N>): UpdateOperation,
 }

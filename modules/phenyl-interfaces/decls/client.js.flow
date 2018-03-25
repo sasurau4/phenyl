@@ -4,6 +4,14 @@ import type {
 } from './id.js.flow'
 import type {
   TypeMap,
+  AuthCommandMap,
+  AuthCredentials,
+  AuthOptions,
+  CustomParams,
+  CustomResult,
+  CustomQueryMap,
+  CustomCommandMap,
+  EntityMap,
   EntityMapOf,
   CustomQueryMapOf,
   CustomCommandMapOf,
@@ -11,7 +19,6 @@ import type {
 } from './type-map.js.flow'
 import type {
   PreEntity,
-  EntityMap,
 } from './entity.js.flow'
 import type {
   WhereQuery,
@@ -25,15 +32,12 @@ import type {
   Session,
 } from './session.js.flow'
 import type {
-  CustomQueryMap,
   CustomQueryResult,
   SingleQueryResult,
   QueryResult,
   PullQueryResult,
 } from './query-result.js.flow'
 import type {
-  AuthCommandMap,
-  CustomCommandMap,
   CustomCommandResult,
   DeleteCommandResult,
   GetCommandResult,
@@ -78,16 +82,10 @@ export interface EntityClient<M: EntityMap> {
   createSessionClient(): SessionClient
 }
 
-export type CustomParams<T: CustomQueryMap | CustomCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'params'>
-export type CustomResult<T: CustomQueryMap | CustomCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'result'>
-
 export interface CustomClient<QM: CustomQueryMap, CM: CustomCommandMap> {
   runCustomQuery<N: $Keys<QM>>(query: CustomQuery<N, CustomParams<QM, N>>, sessionId?: ?Id): Promise<CustomQueryResult<CustomResult<QM, N>>>,
   runCustomCommand<N: $Keys<CM>>(command: CustomCommand<N, CustomParams<CM, N>>, sessionId?: ?Id): Promise<CustomCommandResult<CustomResult<CM, N>>>,
 }
-
-export type AuthCredentials<T: AuthCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'credentials'>
-export type AuthOptions<T: AuthCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'options'>
 
 export interface AuthClient<M: EntityMap, AM: AuthCommandMap> {
   login<N: $Keys<M> & $Keys<AM>>(command: LoginCommand<N, AuthCredentials<AM, N>, AuthOptions<AM, N>>, sessionId?: ?Id): Promise<LoginCommandResult<$ElementType<M, N>>>,
@@ -98,6 +96,6 @@ export type RestApiClient<TM: TypeMap> =
   EntityClient<EntityMapOf<TM>> &
   CustomClient<CustomQueryMapOf<TM>, CustomCommandMapOf<TM>> &
   AuthClient<EntityMapOf<TM>, AuthCommandMapOf<TM>> &
-  RestApiHandler
+  RestApiHandler<TM>
 
 export type SessionClient = KvsClient<Session>

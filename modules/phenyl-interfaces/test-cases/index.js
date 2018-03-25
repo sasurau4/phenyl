@@ -98,10 +98,25 @@ const user14 = {
 }
 
 
-let entityClient
+type ThisEntityMap = {
+  user: {
+    id: string,
+    name: { first: string, last: string },
+    age: ?number,
+    passed?: boolean,
+    subName?: string,
+    hobbies?: Array<string>,
+    favorites?: {
+      music: { singer: string, writer: string }
+    },
+    skills?: string
+  }
+}
+
+let entityClient: EntityClient<ThisEntityMap>
 
 export const assertEntityClient = (
-  entityClientPromise: EntityClient | Promise<EntityClient>,
+  entityClientPromise: EntityClient<ThisEntityMap> | Promise<EntityClient<ThisEntityMap>>,
   kocha: any,
   assert: Function,
 ) => {
@@ -310,6 +325,7 @@ export const assertEntityClient = (
       it('does not return entities when condition undefined and does not match', async () => {
         const result = await entityClient.find({
           entityName: 'user',
+          // $FlowIssue(undefined-is-allowed-here)
           where: {id: undefined}
         })
         assert(result.ok === 1)
@@ -502,7 +518,7 @@ export const assertEntityClient = (
           id: user1.id,
         })
 
-        assert(result2.entity.favorites.music.singer === 'Tatsuro Yamashita')
+        assert(result2.entity.favorites && result2.entity.favorites.music.singer === 'Tatsuro Yamashita')
       })
 
       it ('updates an entity by auto generated id', async () => {
@@ -543,8 +559,8 @@ export const assertEntityClient = (
           id: user1.id,
         })
 
-        assert(result2.entity.skills.length === 1)
-        assert(result2.entity.favorites.music.writer === 'Tatsuro Yamashita')
+        assert(result2.entity.skills && result2.entity.skills.length === 1)
+        assert(result2.entity.favorites && result2.entity.favorites.music.writer === 'Tatsuro Yamashita')
       })
     })
 
@@ -566,7 +582,7 @@ export const assertEntityClient = (
 
         assert(result2.entities.length > 0)
         result2.entities.forEach(entity => {
-          assert(entity.favorites.music.singer === 'Tatsuro Yamashita')
+          assert(entity.favorites && entity.favorites.music.singer === 'Tatsuro Yamashita')
         })
       })
 
@@ -587,7 +603,7 @@ export const assertEntityClient = (
 
         assert(result2.entities.length === 2)
         result2.entities.forEach(entity => {
-          assert(entity.age === 40)
+          assert(entity.age != null && entity.age === 40)
         })
       })
 

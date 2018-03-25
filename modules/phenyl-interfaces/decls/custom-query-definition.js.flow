@@ -4,12 +4,12 @@ import type { Session } from './session.js.flow'
 import type {
   CustomParams,
   CustomResult,
-} from './client.js.flow'
+  CustomQueryMap,
+} from './type-map.js.flow'
 import type {
   CustomQuery,
 } from './query.js.flow'
 import type {
-  CustomQueryMap,
   CustomQueryResult,
 } from './query-result.js.flow'
 

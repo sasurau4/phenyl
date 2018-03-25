@@ -2,11 +2,11 @@
 import getStatusCode from './get-status-code.js'
 
 import type {
-  ResponseData,
+  AnyResponseData,
   EncodedHttpResponse,
 } from 'phenyl-interfaces'
 
-export default function encodeResponse(responseData: ResponseData): EncodedHttpResponse {
+export default function encodeResponse(responseData: AnyResponseData): EncodedHttpResponse {
   const json = JSON.stringify(responseData)
   return {
     body: json,

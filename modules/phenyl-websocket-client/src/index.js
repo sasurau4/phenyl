@@ -4,22 +4,22 @@ import { randomStringWithTimeStamp } from 'phenyl-utils/jsnext'
 
 import type {
   Id,
-  RequestData,
-  ResponseData,
+  RequestDataOf,
+  ResponseDataOf,
   RestApiHandler,
   SubscriptionRequest,
   SubscriptionResult,
+  TypeMap,
   VersionDiff,
   VersionDiffListener,
   VersionDiffSubscriber,
   WebSocketServerMessage,
 } from 'phenyl-interfaces'
 
-
 /**
  * Universal WebSocket Client for PhenylWebSocketServer.
  */
-export default class PhenylWebSocketClient implements RestApiHandler, VersionDiffSubscriber {
+export default class PhenylWebSocketClient<TM: TypeMap> implements RestApiHandler<TM>, VersionDiffSubscriber {
   client: WebSocket
   opened: Promise<boolean>
   versionDiffListener: ?VersionDiffListener
@@ -100,7 +100,7 @@ export default class PhenylWebSocketClient implements RestApiHandler, VersionDif
   /**
    * @public
    */
-  async handleRequestData(reqData: RequestData): Promise<ResponseData> {
+  async handleRequestData(reqData: RequestDataOf<TM>): Promise<ResponseDataOf<TM>> {
     await this.opened
     return new Promise((resolve, reject) => {
       const tag = randomStringWithTimeStamp()
@@ -133,9 +133,15 @@ export default class PhenylWebSocketClient implements RestApiHandler, VersionDif
   /**
    * @private
    */
-  parseAsWaitingResponseData(message: any, tag: string): ?ResponseData {
+  parseAsWaitingResponseData<
+    EN: string,
+    QN: string,
+    CN: string,
+    AN: string,
+  >(message: any, tag: string): ?ResponseData<TM, EN, QN, CN, AN, *> {
     try {
-      const parsed: WebSocketServerMessage = JSON.parse(message)
+      // $FlowIssue(JSON.parse)
+      const parsed: WebSocketServerMessage<TM, EN, QN, CN, AN> = JSON.parse(message)
       return (parsed.resData != null && parsed.tag != null && parsed.tag === tag) ? parsed.resData : null
     }
     catch (e) {
@@ -146,9 +152,15 @@ export default class PhenylWebSocketClient implements RestApiHandler, VersionDif
   /**
    * @private
    */
-  parseAsWaitingSubscriptionResult(message: any, tag: string): ?SubscriptionResult {
+  parseAsWaitingSubscriptionResult<
+    EN: string,
+    QN: string,
+    CN: string,
+    AN: string,
+  >(message: any, tag: string): ?SubscriptionResult {
     try {
-      const parsed: WebSocketServerMessage = JSON.parse(message)
+      // $FlowIssue(JSON.parse)
+      const parsed: WebSocketServerMessage<TM, EN, QN, CN, AN> = JSON.parse(message)
       return (parsed.subscriptionResult != null && parsed.tag != null && parsed.tag === tag) ? parsed.subscriptionResult : null
     }
     catch (e) {
@@ -159,9 +171,15 @@ export default class PhenylWebSocketClient implements RestApiHandler, VersionDif
   /**
    * @private
    */
-  parseAsVersionDiff(message: any): ?VersionDiff {
+  parseAsVersionDiff<
+    EN: string,
+    QN: string,
+    CN: string,
+    AN: string,
+  >(message: any): ?VersionDiff {
     try {
-      const parsed: WebSocketServerMessage = JSON.parse(message)
+      // $FlowIssue(JSON.parse)
+      const parsed: WebSocketServerMessage<TM, EN, QN, CN, AN> = JSON.parse(message)
       return parsed.versionDiff != null ? parsed.versionDiff : null
     }
     catch (e) {

@@ -1,8 +1,11 @@
 // @flow
 
 import type {
-  Entity,
   EntityMap,
+} from './type-map.js.flow'
+
+import type {
+  Entity,
 } from './entity.js.flow'
 import type { Session } from './session.js.flow'
 import type { CRUDRequestData } from './request-data.js.flow'

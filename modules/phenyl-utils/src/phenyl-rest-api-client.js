@@ -5,16 +5,19 @@ import {
 
 import type {
   RestApiClient,
-  AuthCommandMap,
+  CommandParamsOf,
+  CommandResultOf,
+  CredentialsOf,
   CustomQuery,
-  CustomQueryMap,
+  CustomQueryNameOf,
   CustomQueryResult,
   CustomCommand,
-  CustomCommandMap,
+  CustomCommandNameOf,
   CustomCommandResult,
   DeleteCommand,
   DeleteCommandResult,
-  EntityMap,
+  EntityNameOf,
+  EntityOf,
   MultiValuesCommandResult,
   GetCommandResult,
   Id,
@@ -29,26 +32,26 @@ import type {
   LoginCommandResult,
   LogoutCommand,
   LogoutCommandResult,
+  OptionsOf,
   PreEntity,
   PullQuery,
   PullQueryResult,
   PushCommand,
   PushCommandResult,
-  RequestData,
-  ResponseData,
+  QueryParamsOf,
   QueryResult,
+  QueryResultOf,
+  RequestDataOf,
+  ResponseDataOf,
   SessionClient,
   SingleInsertCommand,
   SingleInsertCommandResult,
   SingleQueryResult,
+  TypeMap,
+  UserEntityNameOf,
   MultiUpdateCommand,
   WhereQuery,
 } from 'phenyl-interfaces'
-
-type CustomParams<T: CustomQueryMap | CustomCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'params'>
-type CustomResult<T: CustomQueryMap | CustomCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'result'>
-type AuthCredentials<T: AuthCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'credentials'>
-type AuthOptions<T: AuthCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, N>, 'options'>
 
 /**
  * @abstract
@@ -62,19 +65,19 @@ type AuthOptions<T: AuthCommandMap, N: $Keys<T>> = $ElementType<$ElementType<T, 
  * For example, PhenylHttpClient is the child and its "handleRequestData()" is to access to PhenylRestApi via HttpServer.
  * Also, PhenylRestApiDirectClient is the direct client which contains PhenylRestApi instance.
  */
-export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQueryMap, CM: CustomCommandMap> implements RestApiClient<M, AM, QM, CM> {
+export class PhenylRestApiClient<TM: TypeMap> implements RestApiClient<TM> {
 
   /**
    * @abstract
    */
-  async handleRequestData(reqData: RequestData): Promise<ResponseData> { // eslint-disable-line no-unused-vars
+  async handleRequestData(reqData: RequestDataOf<TM>): Promise<ResponseDataOf<TM>> { // eslint-disable-line no-unused-vars
     throw new Error('No implementation')
   }
 
   /**
    *
    */
-  async find<N: $Keys<M>>(query: WhereQuery<N>, sessionId?: ?Id): Promise<QueryResult<$ElementType<M, N>>> {
+  async find<N: EntityNameOf<TM>>(query: WhereQuery<N>, sessionId?: ?Id): Promise<QueryResult<EntityOf<TM, N>>> {
     const reqData = { method: 'find', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'find') return resData.payload
@@ -84,7 +87,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async findOne<N: $Keys<M>>(query: WhereQuery<N>, sessionId?: ?Id): Promise<SingleQueryResult<$ElementType<M, N>>> {
+  async findOne<N: EntityNameOf<TM>>(query: WhereQuery<N>, sessionId?: ?Id): Promise<SingleQueryResult<EntityOf<TM, N>>> {
     const reqData = { method: 'findOne', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'findOne') return resData.payload
@@ -94,7 +97,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async get<N: $Keys<M>>(query: IdQuery<N>, sessionId?: ?Id): Promise<SingleQueryResult<$ElementType<M, N>>> {
+  async get<N: EntityNameOf<TM>>(query: IdQuery<N>, sessionId?: ?Id): Promise<SingleQueryResult<EntityOf<TM, N>>> {
     const reqData = { method: 'get', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'get') return resData.payload
@@ -104,7 +107,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async getByIds<N: $Keys<M>>(query: IdsQuery<N>, sessionId?: ?Id): Promise<QueryResult<$ElementType<M, N>>> {
+  async getByIds<N: EntityNameOf<TM>>(query: IdsQuery<N>, sessionId?: ?Id): Promise<QueryResult<EntityOf<TM, N>>> {
     const reqData = { method: 'getByIds', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'getByIds') return resData.payload
@@ -114,7 +117,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async pull<N: $Keys<M>>(query: PullQuery<N>, sessionId?: ?Id): Promise<PullQueryResult<$ElementType<M, N>>> {
+  async pull<N: EntityNameOf<TM>>(query: PullQuery<N>, sessionId?: ?Id): Promise<PullQueryResult<EntityOf<TM, N>>> {
     const reqData = { method: 'pull', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'pull') return resData.payload
@@ -124,7 +127,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async insertOne<N: $Keys<M>>(command: SingleInsertCommand<N, PreEntity<$ElementType<M, N>>>, sessionId?: ?Id): Promise<SingleInsertCommandResult> {
+  async insertOne<N: EntityNameOf<TM>>(command: SingleInsertCommand<N, PreEntity<EntityOf<TM, N>>>, sessionId?: ?Id): Promise<SingleInsertCommandResult> {
     const reqData = { method: 'insertOne', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'insertOne') return resData.payload
@@ -134,7 +137,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async insertMulti<N: $Keys<M>>(command: MultiInsertCommand<N, PreEntity<$ElementType<M, N>>>, sessionId?: ?Id): Promise<MultiInsertCommandResult> {
+  async insertMulti<N: EntityNameOf<TM>>(command: MultiInsertCommand<N, PreEntity<EntityOf<TM, N>>>, sessionId?: ?Id): Promise<MultiInsertCommandResult> {
     const reqData = { method: 'insertMulti', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'insertMulti') return resData.payload
@@ -144,7 +147,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async insertAndGet<N: $Keys<M>>(command: SingleInsertCommand<N, PreEntity<$ElementType<M, N>>>, sessionId?: ?Id): Promise<GetCommandResult<$ElementType<M, N>>> {
+  async insertAndGet<N: EntityNameOf<TM>>(command: SingleInsertCommand<N, PreEntity<EntityOf<TM, N>>>, sessionId?: ?Id): Promise<GetCommandResult<EntityOf<TM, N>>> {
     const reqData = { method: 'insertAndGet', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'insertAndGet') return resData.payload
@@ -154,7 +157,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async insertAndGetMulti<N: $Keys<M>>(command: MultiInsertCommand<N, PreEntity<$ElementType<M, N>>>, sessionId?: ?Id): Promise<MultiValuesCommandResult<$ElementType<M, N>, *>> {
+  async insertAndGetMulti<N: EntityNameOf<TM>>(command: MultiInsertCommand<N, PreEntity<EntityOf<TM, N>>>, sessionId?: ?Id): Promise<MultiValuesCommandResult<EntityOf<TM, N>, *>> {
     const reqData = { method: 'insertAndGetMulti', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'insertAndGetMulti') return resData.payload
@@ -164,7 +167,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async updateById<N: $Keys<M>>(command: IdUpdateCommand<N>, sessionId?: ?Id): Promise<IdUpdateCommandResult> {
+  async updateById<N: EntityNameOf<TM>>(command: IdUpdateCommand<N>, sessionId?: ?Id): Promise<IdUpdateCommandResult> {
     const reqData = { method: 'updateById', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'updateById') return resData.payload
@@ -174,7 +177,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async updateMulti<N: $Keys<M>>(command: MultiUpdateCommand<N>, sessionId?: ?Id): Promise<MultiUpdateCommandResult<*>> {
+  async updateMulti<N: EntityNameOf<TM>>(command: MultiUpdateCommand<N>, sessionId?: ?Id): Promise<MultiUpdateCommandResult<*>> {
     const reqData = { method: 'updateMulti', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'updateMulti') return resData.payload
@@ -184,7 +187,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async updateAndGet<N: $Keys<M>>(command: IdUpdateCommand<N>, sessionId?: ?Id): Promise<GetCommandResult<$ElementType<M, N>>> {
+  async updateAndGet<N: EntityNameOf<TM>>(command: IdUpdateCommand<N>, sessionId?: ?Id): Promise<GetCommandResult<EntityOf<TM, N>>> {
     const reqData = { method: 'updateAndGet', payload: command, sessionId}
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'updateAndGet') return resData.payload
@@ -194,7 +197,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async updateAndFetch<N: $Keys<M>>(command: MultiUpdateCommand<N>, sessionId?: ?Id): Promise<MultiValuesCommandResult<$ElementType<M, N>, *>> {
+  async updateAndFetch<N: EntityNameOf<TM>>(command: MultiUpdateCommand<N>, sessionId?: ?Id): Promise<MultiValuesCommandResult<EntityOf<TM, N>, *>> {
     const reqData = { method: 'updateAndFetch', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'updateAndFetch') return resData.payload
@@ -203,7 +206,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async push<N: $Keys<M>>(command: PushCommand<N>, sessionId?: ?Id): Promise<PushCommandResult<$ElementType<M, N>>> {
+  async push<N: EntityNameOf<TM>>(command: PushCommand<N>, sessionId?: ?Id): Promise<PushCommandResult<EntityOf<TM, N>>> {
     const reqData = { method: 'push', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'push') return resData.payload
@@ -213,7 +216,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async delete<N: $Keys<M>>(command: DeleteCommand<N>, sessionId?: ?Id): Promise<DeleteCommandResult> {
+  async delete<N: EntityNameOf<TM>>(command: DeleteCommand<N>, sessionId?: ?Id): Promise<DeleteCommandResult> {
     const reqData = { method: 'delete', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'delete') return resData.payload
@@ -223,7 +226,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async runCustomQuery<N: $Keys<QM>>(query: CustomQuery<N, CustomParams<QM, N>>, sessionId?: ?Id): Promise<CustomQueryResult<CustomResult<QM, N>>> {
+  async runCustomQuery<N: CustomQueryNameOf<TM>>(query: CustomQuery<N, QueryParamsOf<TM, N>>, sessionId?: ?Id): Promise<CustomQueryResult<QueryResultOf<TM, N>>> {
     const reqData = { method: 'runCustomQuery', payload: query, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'runCustomQuery') return resData.payload
@@ -233,7 +236,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async runCustomCommand<N: $Keys<CM>>(command: CustomCommand<N, CustomParams<CM, N>>, sessionId?: ?Id): Promise<CustomCommandResult<CustomResult<CM, N>>> {
+  async runCustomCommand<N: CustomCommandNameOf<TM>>(command: CustomCommand<N, CommandParamsOf<TM, N>>, sessionId?: ?Id): Promise<CustomCommandResult<CommandResultOf<TM, N>>> {
     const reqData = { method: 'runCustomCommand', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'runCustomCommand') return resData.payload
@@ -243,7 +246,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async login<N: $Keys<M> & $Keys<AM>>(command: LoginCommand<N, AuthCredentials<AM, N>, AuthOptions<AM, N>>, sessionId?: ?Id): Promise<LoginCommandResult<$ElementType<M, N>>> {
+  async login<N: UserEntityNameOf<TM>>(command: LoginCommand<N, CredentialsOf<TM, N>, OptionsOf<TM, N>>, sessionId?: ?Id): Promise<LoginCommandResult<EntityOf<TM, N>>> {
     const reqData = { method: 'login', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'login') return resData.payload
@@ -253,7 +256,7 @@ export class PhenylRestApiClient<M: EntityMap, AM: AuthCommandMap, QM: CustomQue
   /**
    *
    */
-  async logout<N: $Keys<M> & $Keys<AM>>(command: LogoutCommand<N>, sessionId?: ?Id): Promise<LogoutCommandResult> {
+  async logout<N: UserEntityNameOf<TM>>(command: LogoutCommand<N>, sessionId?: ?Id): Promise<LogoutCommandResult> {
     const reqData = { method: 'logout', payload: command, sessionId }
     const resData = await this.handleRequestData(reqData)
     if (resData.type === 'logout') return resData.payload

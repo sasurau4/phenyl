@@ -4,6 +4,13 @@ import type {
 } from './entity.js.flow'
 
 import type {
+  RequestData,
+  CRUDRequestData,
+  AuthRequestData,
+  RequestDataOf,
+} from './request-data.js.flow'
+
+import type {
   ServerError,
 } from './error.js.flow'
 
@@ -35,42 +42,113 @@ import type {
   SingleInsertCommandResult,
 } from './command-result.js.flow'
 
-export type CRUDResponseData<E: Entity> =
-  FindResponseData<E> |
-  FindOneResponseData<E> |
-  GetResponseData<E> |
-  GetByIdsResponseData<E> |
-  PullResponseData<E> |
-  InsertOneResponseData |
-  InsertMultiResponseData |
-  InsertAndGetResponseData<E> |
-  InsertAndGetMultiResponseData<E> |
-  UpdateOneResponseData |
-  UpdateMultiResponseData<E> |
-  UpdateAndGetResponseData<E> |
-  UpdateAndFetchResponseData<E> |
-  PushResponseData<E> |
-  DeleteResponseData |
-  ErrorResponseData
+export type CRUDResponseDataMap<
+  TM: TypeMap,
+  EN: string,
+> = {
+  find: FindResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  findOne: FindOneResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  get: GetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  getByIds: GetByIdsResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  pull: PullResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  insertOne: InsertOneResponseData | ErrorResponseData,
+  insertMulti: InsertMultiResponseData | ErrorResponseData,
+  insertAndGet: InsertAndGetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  insertAndGetMulti: InsertAndGetMultiResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  updateById: UpdateOneResponseData | ErrorResponseData,
+  updateMulti: UpdateMultiResponseData<*> | ErrorResponseData,
+  updateAndGet: UpdateAndGetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  updateAndFetch: UpdateAndFetchResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  push: PushResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  delete: DeleteResponseData | ErrorResponseData,
+}
 
-export type CustomQueryResponseData<R: Object> =
-  RunCustomQueryResponseData<R> |
-  ErrorResponseData
+export type CRUDResponseData<
+  TM: TypeMap,
+  EN: string,
+  ReqData: CRUDRequestData<EN, EntityOf<EN>>
+> = $ElementType<CRUDResponseDataMap<TM, EN>, $ElementType<ReqData, 'method'>>
 
-export type CustomCommandResponseData<R: Object> =
-  RunCustomCommandResponseData<R> |
-  ErrorResponseData
+export type CustomQueryResponseDataMap<
+  TM: TypeMap,
+  QN: string,
+> = {
+  runCustomQuery: RunCustomQueryResponseData<QueryResultOf<TM, QN>> | ErrorResponseData
+}
 
-export type AuthResponseData<E: Entity> =
-  LoginResponseData<E> |
-  LogoutResponseData |
-  ErrorResponseData
+export type CustomQueryResponseData<
+  TM: TypeMap,
+  QN: string,
+> = $ElementType<CustomQueryResponseDataMap<TM, QN>, 'runCustomQuery'>
 
-export type ResponseData<N: string, TM: TypeMap> =
-  CRUDResponseData<EntityOf<TM, N>> |
-  CustomQueryResponseData<QueryResultOf<TM, N>> |
-  CustomCommandResponseData<CommandResultOf<TM, N>> |
-  AuthResponseData<EntityOf<TM, N>>
+export type CustomCommandResponseDataMap<
+  TM: TypeMap,
+  CN: string,
+> = {
+  runCustomCommand: RunCustomCommandResponseData<CommandResultOf<TM, CN>> | ErrorResponseData
+}
+
+export type CustomCommandResponseData<
+  TM: TypeMap,
+  CN: string,
+> = $ElementType<CustomCommandResponseDataMap<TM, CN>, 'runCustomCommand'>
+
+
+export type AuthResponseDataMap<
+  TM: TypeMap,
+  AN: string,
+> = {
+  login: LoginResponseData<EntityOf<TM, AN>> | ErrorResponseData,
+  logout: LogoutResponseData | ErrorResponseData
+}
+
+export type AuthResponseData<
+  TM: TypeMap,
+  AN: string,
+  ReqData: AuthRequestData<TM, AN>
+> = $ElementType<AuthResponseDataMap<TM, AN>, $ElementType<ReqData, 'method'>>
+
+
+export type ResponseDataMap<
+  TM: TypeMap,
+  EN: string,
+  QN: string,
+  CN: string,
+  AN: string,
+> = {
+  find: FindResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  findOne: FindOneResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  get: GetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  getByIds: GetByIdsResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  pull: PullResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  insertOne: InsertOneResponseData | ErrorResponseData,
+  insertMulti: InsertMultiResponseData | ErrorResponseData,
+  insertAndGet: InsertAndGetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  insertAndGetMulti: InsertAndGetMultiResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  updateById: UpdateOneResponseData | ErrorResponseData,
+  updateMulti: UpdateMultiResponseData<*> | ErrorResponseData,
+  updateAndGet: UpdateAndGetResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  updateAndFetch: UpdateAndFetchResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  push: PushResponseData<EntityOf<TM, EN>> | ErrorResponseData,
+  delete: DeleteResponseData | ErrorResponseData,
+  runCustomQuery: RunCustomQueryResponseData<QueryResultOf<TM, QN>> | ErrorResponseData,
+  runCustomCommand: RunCustomCommandResponseData<CommandResultOf<TM, CN>> | ErrorResponseData,
+  login: LoginResponseData<EntityOf<TM, AN>> | ErrorResponseData,
+  logout: LogoutResponseData | ErrorResponseData
+}
+
+
+export type ResponseData<
+  TM: TypeMap,
+  EN: string,
+  QN: string,
+  CN: string,
+  AN: string,
+  ReqData: RequestData<TM, EN, QN, CN, AN>
+> = $ElementType<ResponseDataMap<TM, EN, QN, CN, AN>, $ElementType<ReqData, 'method'>>
+
+export type AnyResponseData = ResponseData<*, *, *, *, *, *>
+export type ResponseDataOf<TM: TypeMap> = ResponseData<TM, *, *, *, *, RequestDataOf<TM>>
 
 export type FindResponseData<E: Entity> = {|
   type: 'find',
@@ -124,7 +202,7 @@ export type UpdateOneResponseData = {|
 
 export type UpdateMultiResponseData<E: Entity> = {|
   type: 'updateMulti',
-  +payload: MultiUpdateCommandResult<E, *>,
+  +payload: MultiUpdateCommandResult<E>,
 |}
 
 export type UpdateAndGetResponseData<E: Entity> = {|
@@ -134,7 +212,7 @@ export type UpdateAndGetResponseData<E: Entity> = {|
 
 export type UpdateAndFetchResponseData<E: Entity> = {|
   type: 'updateAndFetch',
-  +payload: MultiValuesCommandResult<E>,
+  +payload: MultiValuesCommandResult<E, *>,
 |}
 
 export type PushResponseData<E: Entity> = {|

@@ -13,10 +13,10 @@ import type {
   TypeMap
 } from './type-map.js.flow'
 
-export type ServerParams = {
-  restApiHandler: RestApiHandler,
+export type ServerParams<TM: TypeMap> = {
+  restApiHandler: RestApiHandler<TM>,
   modifyPath?: PathModifier,
-  customRequestHandler?: CustomRequestHandler
+  customRequestHandler?: CustomRequestHandler<TM>
 }
 
 /**

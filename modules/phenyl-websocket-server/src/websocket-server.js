@@ -15,22 +15,23 @@ import type {
   WebSocketServerParams,
   SubscriptionResult,
   VersionDiff,
+  TypeMap
 } from 'phenyl-interfaces'
 
 /**
  * WebSocket server emitting VersionDiff
  */
-export class PhenylWebSocketServer {
+export class PhenylWebSocketServer<TM: TypeMap> {
   /**
    * Instance of the result: require('http').createServer()
    */
   server: net$Server
 
-  restApiHandler: RestApiHandler
+  restApiHandler: RestApiHandler<TM>
 
   clients: Array<WebSocketClientInfo>
 
-  constructor(server: net$Server, params: WebSocketServerParams) {
+  constructor(server: net$Server, params: WebSocketServerParams<TM>) {
     this.server = server
     this.restApiHandler = params.restApiHandler
     this.clients = []
@@ -57,7 +58,7 @@ export class PhenylWebSocketServer {
   async onMessage(message: any, clientInfo: WebSocketClientInfo) {
     let tag
     try {
-      const clientMessage: WebSocketClientMessage = JSON.parse(message)
+      const clientMessage: WebSocketClientMessage<TM> = JSON.parse(message)
       const { tag } = clientMessage
       if (clientMessage.reqData != null) {
         const resData = await this.restApiHandler.handleRequestData(clientMessage.reqData)

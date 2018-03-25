@@ -9,16 +9,16 @@ import type { ProEntity } from './entity.js.flow'
 type EntityName = string
 
 // see https://docs.mongodb.com/manual/reference/command/insert/
-export type SingleInsertCommand<N: EntityName, E: ProEntity> = {|
+export type SingleInsertCommand<N: EntityName, P: ProEntity> = {|
   entityName: N, // "insert" key in MongoDB reference
-  value: E, // "documents" key in MongoDB reference
+  value: P, // "documents" key in MongoDB reference
   ordered?: boolean,
 |}
 
 // see https://docs.mongodb.com/manual/reference/command/insert/
-export type MultiInsertCommand<N: EntityName, E: ProEntity> = {|
+export type MultiInsertCommand<N: EntityName, P: ProEntity> = {|
   entityName: N, // "insert" key in MongoDB reference
-  values: Array<E>, // "documents" key in MongoDB reference
+  values: Array<P>, // "documents" key in MongoDB reference
   ordered?: boolean,
 |}
 
